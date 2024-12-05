@@ -1,94 +1,235 @@
-<!DOCTYPE HTML>
-<html>  
-<head>                 
-<meta http-equiv="content-type" content="text/html; charset=UTF-8">  
-<title>动态鼠标蜘蛛网特效</title>            
-
-</head>
-<body> 
-    <h1 style="text-align:center;">欢迎来到我的网站</h1>
-</body>
-<script type="text/javascript" src="https://cdn.bootcss.com/canvas-nest.js/1.0.1/canvas-nest.min.js"></script>　
-<script>
-!
-function() {
-    function n(n, e, t) {
-        return n.getAttribute(e) || t
-    }
-    function e(n) {
-        return document.getElementsByTagName(n)
-    }
-    function t() {
-        var t = e("script"),
-        o = t.length,
-        i = t[o - 1];
-        return {
-            l: o,
-            z: n(i, "zIndex", -1),
-            o: n(i, "opacity", .5),
-            c: n(i, "color", "0,0,0"),
-            n: n(i, "count", 99)
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的炫酷博客</title>
+    <style>
+        /* 全局样式重置 */
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #000;
+            color: #fff;
+            overflow-x: hidden;
         }
-    }
-    function o() {
-        a = m.width = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth,
-        c = m.height = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight
-    }
-    function i() {
-        r.clearRect(0, 0, a, c);
-        var n, e, t, o, m, l;
-        s.forEach(function(i, x) {
-            for (i.x += i.xa, i.y += i.ya, i.xa *= i.x > a || i.x < 0 ? -1 : 1, i.ya *= i.y > c || i.y < 0 ? -1 : 1, r.fillRect(i.x - .5, i.y - .5, 1, 1), e = x + 1; e < u.length; e++) n = u[e],
-            null !== n.x && null !== n.y && (o = i.x - n.x, m = i.y - n.y, l = o * o + m * m, l < n.max && (n === y && l >= n.max / 2 && (i.x -= .03 * o, i.y -= .03 * m), t = (n.max - l) / n.max, r.beginPath(), r.lineWidth = t / 2, r.strokeStyle = "rgba(" + d.c + "," + (t + .2) + ")", r.moveTo(i.x, i.y), r.lineTo(n.x, n.y), r.stroke()))
-        }),
-        x(i)
-    }
-    var a, c, u, m = document.createElement("canvas"),
-    d = t(),
-    l = "c_n" + d.l,
-    r = m.getContext("2d"),
-    x = window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame ||
-    function(n) {
-        window.setTimeout(n, 1e3 / 45)
-    },
-    w = Math.random,
-    y = {
-        x: null,
-        y: null,
-        max: 2e4
-    };
-    m.id = l,
-    m.style.cssText = "position:fixed;top:0;left:0;z-index:" + d.z + ";opacity:" + d.o,
-    e("body")[0].appendChild(m),
-    o(),
-    window.onresize = o,
-    window.onmousemove = function(n) {
-        n = n || window.event,
-        y.x = n.clientX,
-        y.y = n.clientY
-    },
-    window.onmouseout = function() {
-        y.x = null,
-        y.y = null
-    };
-    for (var s = [], f = 0; d.n > f; f++) {
-        var h = w() * a,
-        g = w() * c,
-        v = 2 * w() - 1,
-        p = 2 * w() - 1;
-        s.push({
-            x: h,
-            y: g,
-            xa: v,
-            ya: p,
-            max: 6e3
-        })
-    }
-    u = s.concat([y]),
-    setTimeout(function() {
-        i()
-    },
-    100)
-} ();
-</script>
+
+        .video-container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .video-container video {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            min-width: 100%;
+            min-height: 100%;
+            z-index: -1;
+        }
+
+        .video-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .video-overlay h1 {
+            font-size: 4rem;
+            color: #fff;
+            text-shadow: 0 0 20px #0ff, 0 0 40px #0ff, 0 0 60px #0ff;
+            animation: glow 3s infinite;
+        }
+
+        .scroll-arrow {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 30px;
+            height: 30px;
+            border: 3px solid #fff;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            animation: bounce 2s infinite;
+            cursor: pointer;
+        }
+
+        .scroll-arrow::after {
+            content: '';
+            display: block;
+            width: 10px;
+            height: 10px;
+            border-right: 3px solid #fff;
+            border-bottom: 3px solid #fff;
+            transform: rotate(45deg);
+        }
+
+        @keyframes glow {
+            0% { text-shadow: 0 0 5px #0ff, 0 0 10px #0ff, 0 0 20px #0ff; }
+            50% { text-shadow: 0 0 20px #0ff, 0 0 30px #0ff, 0 0 40px #0ff; }
+            100% { text-shadow: 0 0 5px #0ff, 0 0 10px #0ff, 0 0 20px #0ff; }
+        }
+
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateX(-50%) translateY(0);
+            }
+            50% {
+                transform: translateX(-50%) translateY(10px);
+            }
+        }
+
+        main {
+            background: linear-gradient(120deg, #000428, #004e92);
+            color: #fff;
+            padding: 50px 20px;
+        }
+
+        header {
+            text-align: center;
+            padding: 50px 20px;
+            background: rgba(0, 0, 0, 0.6);
+        }
+
+        header h1 {
+            font-size: 3rem;
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            animation: glow 2s infinite;
+        }
+
+        nav {
+            margin: 20px 0;
+        }
+
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            margin: 0 15px;
+            font-size: 1.2rem;
+            transition: color 0.3s;
+        }
+
+        nav a:hover {
+            color: #0ff;
+        }
+
+        section {
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        section h2 {
+            animation: glow 2s infinite;
+        }
+
+        .blog-post {
+            margin: 20px auto;
+            max-width: 600px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            animation: glow 3s infinite;
+        }
+
+        .blog-post h2 {
+            font-size: 1.5rem;
+            margin: 0 0 10px;
+        }
+
+        .blog-post p {
+            line-height: 1.6;
+        }
+
+        footer {
+            padding: 20px;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.8);
+            color: #ccc;
+            font-size: 0.9rem;
+        }
+
+        footer a {
+            color: #0ff;
+            text-decoration: none;
+            transition: color 0.3s;
+            animation: glow 2s infinite;
+        }
+
+        footer a:hover {
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="video-container">
+        <video autoplay muted loop>
+            <source src="test.mp4" type="video/mp4">
+            您的浏览器不支持视频播放。
+        </video>
+        <div class="video-overlay">
+            <h1>欢迎来到我的博客</h1>
+        </div>
+        <div class="scroll-arrow" onclick="document.querySelector('main').scrollIntoView({ behavior: 'smooth' });"></div>
+    </div>
+
+    <main>
+        <header>
+            <h1>我的太空博客</h1>
+            <nav>
+                <a href="#about">关于我</a>
+                <a href="#blogs">博客文章</a>
+                <a href="#contact">联系我</a>
+            </nav>
+        </header>
+
+        <section id="about">
+            <h2>关于我</h2>
+            <p>你好！我是一个热爱开发、写作和探索数字世界的人。我喜欢创造网站、撰写故事，并不断学习新知识。</p>
+        </section>
+
+        <section id="blogs">
+            <h2>最新文章</h2>
+
+            <div class="blog-post">
+                <h2>文章标题 1</h2>
+                <p>这是第一篇文章的摘要，内容包括一些有趣的主题和见解。</p>
+            </div>
+
+            <div class="blog-post">
+                <h2>文章标题 2</h2>
+                <p>第二篇文章的内容摘要，包含实用技巧和个人经验分享。</p>
+            </div>
+
+            <div class="blog-post">
+                <h2>文章标题 3</h2>
+                <p>第三篇文章的精彩部分，探索新兴技术和前沿趋势。</p>
+            </div>
+        </section>
+
+        <section id="contact">
+            <h2>联系我</h2>
+            <p>欢迎通过<a href="mailto:example@example.com">邮箱</a>与我取得联系。</p>
+        </section>
+
+        <footer>
+            <p>&copy; 2024 我的炫酷博客</p>
+        </footer>
+    </main>
+</body>
 </html>
